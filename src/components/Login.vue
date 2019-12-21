@@ -9,11 +9,11 @@
       <el-form ref="loginFormRef" :rules="loginFormRules" :model="loginForm" label-width="0px" class="login_form">
         <!-- 用户名 -->
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" prefix-icon="iconfont icon-zhanghu"></el-input>
+          <el-input v-model="loginForm.username" prefix-icon="iconfont icon-user"></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item prop="password">
-          <el-input type="password" v-model="loginForm.password" prefix-icon="iconfont icon-lock"></el-input>
+          <el-input type="password" v-model="loginForm.password" prefix-icon="iconfont icon-3702mima"></el-input>
         </el-form-item>
         <!-- 按钮 -->
         <el-form-item class="btns">
@@ -36,10 +36,12 @@ export default {
       },
       loginFormRules: {
         username: [
-          { required: true, message: '请输入账户名称', trigger: 'blur' }
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 10, message: '用户名长度在3~10个字符之间', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 4, max: 15, message: '密码长度在4~15个字符之间', trigger: 'blur' }
         ]
       }
     }
@@ -49,14 +51,17 @@ export default {
     resetLoginForm() {
       this.$refs.loginFormRef.resetFields()
     },
-    async login() {
-      const { data: res } = await this.$http.post('login', this.loginForm)
-      if (res.meta.status !== 200) {
-        return this.$message.error('登陆失败！')
-      }
-      this.$message.success('登陆成功!')
-      window.sessionStorage.setItem('token', res.data.token)
-      this.$router.push('/home')
+    login() {
+      this.$refs.loginFormRef.validate(async valid => {
+        if(!valid) return
+        const { data: res } = await this.$http.post('login', this.loginForm)
+        if (res.meta.status !== 200) {
+          return this.$message.error('登录失败！')
+        }
+        this.$message.success('登录成功!')
+        window.sessionStorage.setItem('token', res.data.token)
+        this.$router.push('/home')
+      })
     }
   }
 }
